@@ -8,6 +8,16 @@ We using Pokemon Api
 
 [PokéAPI](https://pokeapi.co/)
 
+## Plans for now
+
+Adding pokemon fights 
+
+- Choosing your own cards or selecting them randomly
+
+## Plans for future
+
+Adding personal pokemon collections
+
 ## Development server
 
 To start a local development server, run:
