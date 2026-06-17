@@ -1,0 +1,133 @@
+<section class="pokedex">
+  <header class="hero">
+    <h1>Pokédex</h1>
+    <p>Wyszukuj i przeglądaj Pokémony</p>
+  </header>
+
+  <div class="top-controls">
+    <label class="type-toggle">
+      <input #typeToggle type="checkbox" (change)="onTypeViewToggle(typeToggle.checked)" />
+      Grupuj według typów
+    </label>
+  </div>
+
+  <div class="search-wrap">
+    <input
+      #searchInput
+      class="search-input"
+      type="search"
+      (input)="onSearch(searchInput.value)"
+      placeholder="Szukaj pokemona..."
+    />
+  </div>
+
+  <ng-container *ngIf="!isTypeView || !!searchInput.value.trim(); else groupedByTypes">
+    <div class="cards-grid">
+      <article
+        class="card"
+        [class.mega-card]="p.name.includes('mega')"
+        *ngFor="let p of filteredPokemon; trackBy: trackByPokemon"
+        (click)="openStats(p)"
+      >
+        <img [src]="p.image" [alt]="p.name" />
+        <p>{{ p.name }}</p>
+      </article>
+    </div>
+
+    <div class="actions">
+      <button class="load-more" *ngIf="canShowMore" (click)="showMore()">Pokaż więcej</button>
+    </div>
+  </ng-container>
+
+  <ng-template #groupedByTypes>
+    <div class="type-list" *ngIf="!loadingTypes; else loadingTypesTpl">
+      <section class="type-panel" *ngFor="let typeName of pokemonTypes; trackBy: trackByType">
+        <button class="type-header" (click)="toggleType(typeName)">
+          <span class="type-name">{{ typeName }}</span>
+          <span class="type-arrow">{{ isTypeOpen(typeName) ? '▲' : '▼' }}</span>
+        </button>
+
+        <div class="type-content" *ngIf="isTypeOpen(typeName)">
+          <p class="loading-text" *ngIf="loadingTypeNames.has(typeName)">Ładowanie...</p>
+
+          <div class="cards-grid" *ngIf="!loadingTypeNames.has(typeName)">
+            <article
+              class="card"
+              [class.mega-card]="p.name.includes('mega')"
+              *ngFor="let p of typeGroups[typeName] || []; trackBy: trackByPokemon"
+              (click)="openStats(p)"
+            >
+              <img [src]="p.image" [alt]="p.name" />
+              <p>{{ p.name }}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </ng-template>
+
+  <ng-template #loadingTypesTpl>
+    <p class="loading-text">Ładowanie typów...</p>
+  </ng-template>
+</section>
+
+<div class="modal-backdrop" *ngIf="selectedPokemon" (click)="closeStats()">
+  <div class="modal-stats" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeStats()">✖</button>
+
+    <img class="modal-image" [src]="selectedPokemon.image" [alt]="selectedPokemon.name" />
+    <h2>{{ selectedPokemon.name }}</h2>
+
+    <p class="loading-text dark" *ngIf="loadingSelectedPokemon">Ładowanie statystyk...</p>
+
+    <div class="pokemon-details" *ngIf="!loadingSelectedPokemon">
+      <div class="detail-row">
+        <span>ID</span>
+        <strong>#{{ selectedPokemon.id }}</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Wzrost</span>
+        <strong>{{ selectedPokemon.height }} dm</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Waga</span>
+        <strong>{{ selectedPokemon.weight }} hg</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Doświadczenie</span>
+        <strong>{{ selectedPokemon.baseExperience }}</strong>
+      </div>
+
+      <div class="details-section" *ngIf="selectedPokemon.types?.length">
+        <h3>Typy</h3>
+        <div class="tags">
+          <span class="tag" *ngFor="let type of selectedPokemon.types">{{ type }}</span>
+        </div>
+      </div>
+
+      <div class="details-section" *ngIf="selectedPokemon.abilities?.length">
+        <h3>Umiejętności</h3>
+        <div class="tags">
+          <span class="tag" *ngFor="let ability of selectedPokemon.abilities">{{ ability }}</span>
+        </div>
+      </div>
+
+      <div class="details-section" *ngIf="selectedPokemon.stats?.length">
+        <h3>Statystyki</h3>
+
+        <div class="stat-row" *ngFor="let stat of selectedPokemon.stats">
+          <span>{{ stat.name }}</span>
+
+          <div class="stat-bar">
+            <div class="stat-fill" [style.width.%]="stat.value > 100 ? 100 : stat.value"></div>
+          </div>
+
+          <strong>{{ stat.value }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
