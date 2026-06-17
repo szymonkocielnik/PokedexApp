@@ -1,6 +1,12 @@
 # PokedexApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.1.
+This WebApp is about searching pokemons and lerning about them(types, atacks, vitals)
+
+## Tools
+
+We using Pokemon Api
+
+[PokéAPI](https://pokeapi.co/)
 
 ## Development server
 
